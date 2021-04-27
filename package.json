@@ -1,0 +1,25 @@
+{
+  "name": "puppeteer-test",
+  "version": "1.0.0",
+  "description": "twitter dm bot test",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Aidan Walz",
+  "license": "ISC",
+  "keywords": [],
+  "devDependencies": {
+    "electron": "^12.0.5"
+  },
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "googleapis": "^39.2.0",
+    "gs": "0.0.2",
+    "puppeteer": "^9.0.0",
+    "readline": "^1.3.0",
+    "request": "^2.88.2"
+  }
+}
