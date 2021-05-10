@@ -1,6 +1,7 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const {google} = require('googleapis');
+const path = require('path');
 
 const googleAuth = require('./google-auth');
 
@@ -35,8 +36,17 @@ function main(auth) {
 	);
 
     (async () => {
+		const isPkg = typeof process.pkg !== 'undefined';
+		const chromiumExecutablePath = (isPkg ?
+			puppeteer.executablePath().replace(
+				/^.*?\/node_modules\/puppeteer\/\.local-chromium/,
+				path.join(path.dirname(process.execPath), 'chromium')
+			)
+			: puppeteer.executablePath()
+		);
+
 		const browser = await puppeteer.launch({ 
-			executablePath: './chromium/chrome.exe',
+			executablePath: chromiumExecutablePath,
 			headless: false
 		});
 		const [page] = await browser.pages();
@@ -54,7 +64,7 @@ function main(auth) {
 
 		// Return page with form
 		app.get('/', (req, res) => {
-			res.sendFile(__dirname + "\\assets\\index.html");
+			res.sendFile(__dirname + "/assets/index.html");
 		});
 
 		// Message to send

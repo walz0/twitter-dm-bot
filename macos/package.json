@@ -9,9 +9,7 @@
     "get-port": "^5.1.1",
     "googleapis": "^39.0.0",
     "open": "^8.0.6",
-    "puppeteer": "^9.0.0",
-    "puppeteer-extra": "^3.1.18",
-    "puppeteer-extra-plugin-stealth": "^2.7.8"
+    "puppeteer": "^9.0.0"
   },
   "devDependencies": {
     "pkg": "^5.0.0"
@@ -27,6 +25,8 @@
   "bin": "index.js",
   "main": "index.js",
   "scripts": {
+    "build": "rm -rf build && pkg . --out-path build",
+    "postbuild": "cp -R ./node_modules/puppeteer/.local-chromium build/chromium && cp credentials.json build && cp -R assets build",
     "start": "node ."
   },
   "license": "Apache-2.0"

@@ -1,12 +1,4 @@
-flow ::
-    - user places a list of @'s to send a specific message to in a file
-    - user logs in
-    - bot navigates to twitter.com/messages
-    - read list items to check for @ and make sure its not a group dm
-    - do not click on user if they have dm disabled
-    - bot sends the message to the specified @'s
-
-::  twitter creates group dm when you select multiple people and send
-    one message
-
-::  must compose messages one by one
+// get names and links
+send list of names to front end
+    - most likely with XHTTPRequest to backend
+send list of selected names to back end
