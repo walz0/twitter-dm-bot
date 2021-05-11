@@ -32,7 +32,7 @@ async function getNewToken(oAuth2Client, callback) {
     });
 
     // Backend server port
-    const port = 3000;
+    const port = 5000;
 
     // Start server
     app.listen(port);
