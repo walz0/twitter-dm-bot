@@ -1,4 +1,5 @@
-// get names and links
-send list of names to front end
-    - most likely with XHTTPRequest to backend
-send list of selected names to back end
+Downloading files on macOS ::
+    curl -L0 [url] --output [filename]
+
+move files out and replace current ones
+github releases
