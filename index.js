@@ -76,8 +76,9 @@ function main(auth) {
 			// Assign filtered user list
 			users = userFilter;
 			console.log("Selected Users:", users);
+
 			// Assign message
-			message = req.body.message;
+			message = String(req.body.message).replace(/\r?\n|\r/g, ' ');
 			console.log("Message:", message);
 			// Navigate to twitter
 			await page.goto('https://twitter.com/login');
