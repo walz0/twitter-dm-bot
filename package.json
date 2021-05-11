@@ -5,16 +5,11 @@
   "author": "Aidan Walz",
   "private": true,
   "dependencies": {
-    "axios": "^0.21.1",
     "express": "^4.17.1",
     "get-port": "^5.1.1",
     "googleapis": "^39.0.0",
     "open": "^8.0.6",
-    "puppeteer": "^9.0.0",
-    "puppeteer-extra": "^3.1.18",
-    "puppeteer-extra-plugin-stealth": "^2.7.8",
-    "request": "^2.88.2",
-    "unzipper": "^0.10.11"
+    "puppeteer": "^9.0.0"
   },
   "devDependencies": {
     "pkg": "^5.0.0"
@@ -30,6 +25,8 @@
   "bin": "index.js",
   "main": "index.js",
   "scripts": {
+    "build-mac": "rm -rf build && pkg . --out-path build",
+    "postbuild-mac": "cp -R ./node_modules/puppeteer/.local-chromium build/chromium && cp credentials.json build && cp -R assets build",
     "start": "node ."
   },
   "license": "Apache-2.0"

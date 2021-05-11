@@ -39,7 +39,7 @@ async function getNewToken(oAuth2Client, callback) {
 
     // Return page with form
     app.get('/', (req, res) => {
-        res.sendFile(__dirname + "\\assets\\auth.html");
+        res.sendFile(__dirname + "/assets/auth.html");
     });
 
     // Process form submission and get message
