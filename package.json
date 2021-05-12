@@ -8,8 +8,10 @@
     "express": "^4.17.1",
     "get-port": "^5.1.1",
     "googleapis": "^39.0.0",
+    "mv": "^2.1.1",
     "open": "^8.0.6",
-    "puppeteer": "^9.0.0"
+    "puppeteer": "^9.0.0",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "pkg": "^5.0.0"

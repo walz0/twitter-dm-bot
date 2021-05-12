@@ -1,2 +1,11 @@
+<<<<<<< Updated upstream
 move files out and replace current ones
+=======
+move files out and replace current ones
+
+build updater as separate executable, check for updates
+from main client then close process and run updater
+
+
 // github releases
+>>>>>>> Stashed changes
