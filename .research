@@ -3,3 +3,23 @@
 
 LIMITS
 - 1000 requets per user / 15000 per app
+
+Example request ::
+    curl --request POST \
+        --url https://api.twitter.com/1.1/direct_messages/events/new.json \
+        --header 'Authorization: OAuth oauth_consumer_key="hy9z7IBnscMhYoUg2kaxRcwo0", oauth_nonce="fWiyhjvxKhTA3emchcAoRaqAI9zf38bK", oauth_signature="2MjO8u8QC6ufmhKSl%2FmZ06L25%2Bg%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1620937833", oauth_token="785961919-JseVFIfyIJNjgehnzzNtImuVWOfYpH55C7uN2JvV", oauth_version="1.0"' \
+        --header 'Content-Type: application/json' \
+        --cookie 'personalization_id=%22v1_IMWf7JBCmbLBgtiaqMiVvw%3D%3D%22; guest_id=v1%253A162084886507305004; lang=en' \
+        --data '{
+            "event": {
+                "type": "message_create", 
+                "message_create": {
+                    "target": {
+                        "recipient_id": "785961919"
+                    }, 
+                    "message_data": {
+                        "text": "f3"
+                    }
+                }
+            }
+        }'
