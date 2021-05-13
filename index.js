@@ -1,8 +1,8 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const {google} = require('googleapis');
-
 const googleAuth = require('./google-auth');
+const twitter = require('twitter');
 
 const express = require('express');
 const app = express();
@@ -56,9 +56,8 @@ function main(auth) {
 			process.kill(process.pid, 'SIGTERM')
 		})
 
-		const port = 3000;
-
         // Start backend
+		const port = 3000;
         app.listen(port);
 
 		// Return page with form
@@ -68,7 +67,6 @@ function main(auth) {
 
 		// Message to send
 		let message = '';
-
 		// Process form submission and get message
 		app.post('/submit', async (req, res) => {
 			// Keys

@@ -1,0 +1,5 @@
+- A user may only send up to 5 unanswered messages per 24 hours
+    Each response resets the cooldown
+
+LIMITS
+- 1000 requets per user / 15000 per app
