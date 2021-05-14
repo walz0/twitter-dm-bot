@@ -2,7 +2,6 @@ const fs = require('fs');
 const {google} = require('googleapis');
 const puppeteer = require('puppeteer');
 const open = require('open');
-const getPort = require('get-port');
 
 const express = require('express');
 const app = express();
@@ -32,7 +31,7 @@ async function getNewToken(oAuth2Client, callback) {
     });
 
     // Backend server port
-    const port = 3000;
+    const port = 5000;
 
     // Start server
     app.listen(port);

@@ -1,5 +1,7 @@
-call github api to check for new releases, cache current release
-in a dotfile
+UPDATER ::
+    call github api to check for new releases, cache current release
+    in a dotfile
 
-twitter api dm
-    post request
+BOT ::
+    get list of blocked users
+    parse list of dm conversations to ids
