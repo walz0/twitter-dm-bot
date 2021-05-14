@@ -15,7 +15,32 @@ let oauth = new OAuth.OAuth(
     11
 );
 
-async function get_users(users) {
+const get_user = async(user) => {
+    const user_url = 'https://api.twitter.com/2/users/by?usernames=' + user;
+    const header = oauth.authHeader(
+        user_url,
+        process.env.ACCESS_TOKEN,
+        process.env.TOKEN_SECRET,
+        'get'
+    );
+    let output = {};
+    await axios({
+        method: 'get',
+        url: user_url,
+        headers: {
+            "Authorization": header,
+        }
+    }).then((res) => {
+        let user = res.data.data[0];
+        output = {
+            "id": user.id,
+            "name": user.name
+        }
+    }).catch((err) => { throw err });
+    return output;
+}
+
+const get_users = async (users) => {
     /*
         string[] => Object[] { id, name, username }
     */
@@ -26,7 +51,7 @@ async function get_users(users) {
         process.env.TOKEN_SECRET,
         'get'
     );
-    const output = {};
+    let output = {};
     await axios({
         method: 'get',
         url: user_url,
@@ -36,7 +61,7 @@ async function get_users(users) {
     }).then((res) => {
         for (var i = 0; i < res.data.data.length; i++) {
             let user = res.data.data[i];
-            output[user.username] = {
+            output[String(user.username).toLowerCase()] = {
                 "id": user.id,
                 "name": user.name
             };
@@ -45,7 +70,7 @@ async function get_users(users) {
     return output;
 }
 
-async function direct_message(message, recipient_id) {
+const direct_message = async (message, recipient_id) => {
     const dm_url = 'https://api.twitter.com/1.1/direct_messages/events/new.json';
     const header = oauth.authHeader(
         dm_url,
@@ -78,7 +103,13 @@ async function direct_message(message, recipient_id) {
         res.status, 
         res.statusText
         ))
-       .catch((res) => {
-           console.log("Error: Message could not be sent", res.status);
+       .catch((err) => {
+           console.log("Error: Message could not be sent", 
+                        err.response.status, 
+                        err.response.statusText);
        });
 }
+
+exports.direct_message = direct_message;
+exports.get_users = get_users;
+exports.get_user = get_user;

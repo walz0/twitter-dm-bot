@@ -3,5 +3,4 @@ UPDATER ::
     in a dotfile
 
 BOT ::
-    get list of blocked users
     parse list of dm conversations to ids
