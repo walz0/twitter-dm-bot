@@ -3,4 +3,6 @@ UPDATER ::
     in a dotfile
 
 BOT ::
-    parse list of dm conversations to ids
+    port to electron
+    get users in batch request by username
+    send dms to all of the user ids in the list (maybe a small delay between msgs)

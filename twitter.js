@@ -1,8 +1,6 @@
-const twitter = require('twitter');
 const OAuth = require('oauth');
 const axios = require('axios');
 require('dotenv').config();
-
 
 let oauth = new OAuth.OAuth(
     'https://api.twitter.com/oauth/request_token',
@@ -14,6 +12,28 @@ let oauth = new OAuth.OAuth(
     'HMAC-SHA1',
     11
 );
+
+const get_user_by_id = async(user_id) => {
+    const user_url = 'https://api.twitter.com/2/users/' + user_id;
+    const header = oauth.authHeader(
+        user_url,
+        process.env.ACCESS_TOKEN,
+        process.env.TOKEN_SECRET,
+        'get'
+    );
+    let output = {};
+    await axios({
+        method: 'get',
+        url: user_url,
+        headers: {
+            "Authorization": header,
+        }
+    }).then((res) => {
+        let user = res.data.data;
+        output = user;
+    }).catch((err) => { throw err });
+    return output;
+}
 
 const get_user = async(user) => {
     const user_url = 'https://api.twitter.com/2/users/by?usernames=' + user;
@@ -113,3 +133,4 @@ const direct_message = async (message, recipient_id) => {
 exports.direct_message = direct_message;
 exports.get_users = get_users;
 exports.get_user = get_user;
+exports.get_user_by_id = get_user_by_id;
