@@ -1,8 +1,5 @@
 UPDATER ::
-    call github api to check for new releases, cache current release
-    in a dotfile
+    - call github api to check for new releases, cache current release
+      in a dotfile
 
 BOT ::
-    port to electron
-    get users in batch request by username
-    send dms to all of the user ids in the list (maybe a small delay between msgs)

@@ -1,6 +1,39 @@
 const OAuth = require('oauth');
 const axios = require('axios');
+const fs = require('fs');
+const express = require('express');
 require('dotenv').config();
+
+// Log all requests to backend server
+let logging = true;
+// Request results
+let log = [];
+
+if (logging) {
+	const app = express();
+	app.use(express.urlencoded({ extended: true }));
+	app.use(express.json());
+
+    app.listen(8000);
+
+    app.get('/', (req, res) => {
+        res.sendFile(__dirname + '/assets/results.html');
+    })
+
+    app.get('/log', async (req, res) => {
+        for (var i = 0; i < log.length; i++) {
+            if (log[i]['user'] == undefined) {
+                log[i]['user'] = await get_user_by_id(log[i]['id']);
+            }
+        }
+        res.send(log);
+    })
+
+    app.get('/user/:id', async (req, res) => {
+        let user = await get_user_by_id(req.params.id);
+        res.send(user);
+    })
+}
 
 let oauth = new OAuth.OAuth(
     'https://api.twitter.com/oauth/request_token',
@@ -12,6 +45,29 @@ let oauth = new OAuth.OAuth(
     'HMAC-SHA1',
     11
 );
+
+const verify_credentials = async() => {
+    const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
+    const header = oauth.authHeader(
+        url,
+        process.env.ACCESS_TOKEN,
+        process.env.TOKEN_SECRET,
+        'get'
+    );
+    let output;
+    await axios({
+        method: 'get',
+        url: url,
+        headers: {
+            "Authorization": header,
+        }
+    }).then((res) => {
+        output = true;
+    }).catch((err) => { 
+        output = false;
+    });
+    return output;
+}
 
 const get_user_by_id = async(user_id) => {
     const user_url = 'https://api.twitter.com/2/users/' + user_id;
@@ -118,15 +174,31 @@ const direct_message = async (message, recipient_id) => {
                 }
             }
         }
-    }).then((res) => console.log(
-        recipient_id, 
-        res.status, 
-        res.statusText
-        ))
+    }).then((res) => {
+        log.push({
+            'type': 'message_create', 
+            'id': recipient_id, 
+            'status': res.status, 
+            'statusText': res.statusText
+        });
+        console.log(
+            recipient_id, 
+            res.status, 
+            res.statusText
+        )})
        .catch((err) => {
-           console.log("Error: Message could not be sent", 
+            log.push({
+                'type': 'message_create', 
+                'id': recipient_id, 
+                'status': err.response.status, 
+                'statusText': err.response.statusText
+            });
+            console.log("Error: Message could not be sent", 
                         err.response.status, 
                         err.response.statusText);
+            fs.appendFile('.twitterlog',
+                `${(new Date()).toLocaleString()} - ${recipient_id}\n`,
+            () => {});
        });
 }
 
@@ -134,3 +206,4 @@ exports.direct_message = direct_message;
 exports.get_users = get_users;
 exports.get_user = get_user;
 exports.get_user_by_id = get_user_by_id;
+exports.verify_credentials = verify_credentials;

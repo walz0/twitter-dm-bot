@@ -7,20 +7,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <title>Auth Setup</title>
+    <title>API Setup</title>
 </head>
 <body>
-    <h1><i class="fab fa-twitter"></i>Google OAuth Setup</h1>
+    <h1><i class="fab fa-twitter"></i> Twitter API Keys</h1>
     <form method="post" action="/submit">
-        <input type="text" name="auth_code" placeholder="Paste google auth code here...">
+        <input type="text" name="api_key" placeholder="Paste consumer key here...">
+        <input type="text" name="api_secret" placeholder="Paste consumer secret here...">
+        <input type="text" name="access_token" placeholder="Paste token here...">
+        <input type="text" name="token_secret" placeholder="Paste token secret here...">
         <div class="button">
             <input type="submit" value="Submit">
         </div>
     </form>
-    <div class="warning">
+    <!-- <div class="warning">
         You may have to repeat this process every couple of weeks or so, depending
         on how long your token lasts.
-    </div>
+    </div> -->
 </body>
 
 <style>

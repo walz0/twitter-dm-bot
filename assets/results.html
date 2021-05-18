@@ -7,67 +7,44 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <title>twitter-bot</title>
+    <title>Results</title>
 </head>
 <body>
-    <h1><i class="fab fa-twitter"></i> DM Bot</h1>
-    <form method="post" action="/submit">
-        <textarea type="text" name="message" placeholder="Enter message..."></textarea>
-        <div class="button">
-            <input type="submit" value="Submit">
-        </div>
-        <div class="warning">
-            WARNING: This is the message that will be sent, once the bot starts sending it is not possible to stop it
-        </div>
-        <div class="users" id="users_root">
-            <h3>DM list</h3>
-            <div class="select-all">
-                <input type="checkbox" name="all" onchange=toggleAll(event) checked=true>
-                <label for="all">SELECT ALL</label>
-            </div>
-        </div>
-    </form>
+    <h1><i class="fab fa-twitter"></i> DM Results</h1>
+    <div class="users" id="users_root"></div>
 </body>
 
 <script>
-    function toggleAll (e) {
-        let root = document.getElementById('users_root');
-        for (var i = 0; i < root.children.length; i++) {
-            if (root.children[i].className == 'checkbox') {
-                root.children[i].children[0].checked = e.target.checked;
-            }
-        }
-    }
-
     function loadUsers () {
         let users = JSON.parse(this.responseText);
         let root = document.getElementById('users_root');
+        // Remove all children
+        while (root.firstChild) {
+            root.removeChild(root.firstChild);
+        }
 
         for (var i = 0; i < users.length; i++) {
             let div = document.createElement('div');
-            div.className = 'checkbox';
-            let checkbox = document.createElement('input');
-                checkbox.checked = true;
-                checkbox.name = String(i);
-                checkbox.type = 'checkbox';
-                checkbox.value = users[i][0];
-            let label = document.createElement('label');
-                label.htmlFor = checkbox.name;
-            let link = document.createElement('a');
-                link.href = String(users[i][1]);
-                link.target = '_blank';
-                link.innerText = users[i][0];
-            label.appendChild(link);
-            div.appendChild(checkbox);
-            div.appendChild(label);
+            let check = '<i class="fas fa-check" style="color: lime"></i> ';
+            let times = '<i class="fas fa-times" style="color: red"></i> ';
+            if (users[i]['status'] == 200) {
+                div.innerHTML = check + "@" + users[i]['user']['username'];
+            }
+            else {
+                div.innerHTML = times + "@" + users[i]['user']['username'];
+            }
             root.appendChild(div);
         }
     }
 
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", loadUsers);
-    oReq.open("GET", "http://localhost:3000/users");
-    oReq.send();
+    const getLog = () => {
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", loadUsers);
+        oReq.open("GET", "http://localhost:8000/log");
+        oReq.send();
+    }
+
+    setInterval(getLog, 500);
 </script>
 
 <style>
@@ -97,7 +74,7 @@
     }
 
     .users {
-        font-size: 30px;
+        font-size: 25px;
         font-weight: 600;
         color: #fff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
