@@ -73,6 +73,16 @@ const verify_credentials = async() => {
     }).catch((err) => { 
         output = false;
     });
+    oauth = new OAuth.OAuth(
+        'https://api.twitter.com/oauth/request_token',
+        'https://api.twitter.com/oauth/access_token',
+        process.env.API_KEY,
+        process.env.API_SECRET,
+        '1.0',
+        null,
+        'HMAC-SHA1',
+        11
+    );
     return output;
 }
 

@@ -50,7 +50,8 @@ async function twitterAuth(main) {
             // Write new env file
             fs.writeFileSync('.env', output, 'utf8');
             // Start normal process
-            googleAuth.auth(main);
+            // googleAuth.auth(main);
+            twitterAuth();
         });
 
         const isPkg = typeof process.pkg !== 'undefined';
