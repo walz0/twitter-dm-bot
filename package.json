@@ -1,25 +1,42 @@
 {
-  "name": "electron-test",
+  "name": "twitter-bot",
   "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "keywords": [],
+  "description": "A simple bot that sends twitter DMs",
   "author": "Aidan Walz",
-  "license": "ISC",
-  "devDependencies": {
-    "electron": "^12.0.7"
-  },
+  "private": true,
   "dependencies": {
-    "axios": "^0.21.1",
-    "cors": "^2.8.5",
+    "axios-oauth-client": "^1.4.1",
     "dotenv": "^9.0.2",
+    "env": "0.0.2",
     "express": "^4.17.1",
-    "googleapis": "^73.0.0",
+    "get-port": "^5.1.1",
+    "googleapis": "^39.0.0",
+    "cors": "^2.8.5",
+    "mv": "^2.1.1",
     "oauth": "^0.9.15",
-    "open": "^8.0.8",
-    "puppeteer": "^9.1.1"
-  }
+    "open": "^8.0.6",
+    "puppeteer": "^9.0.0",
+    "twit": "^2.2.11",
+    "twitter": "^1.7.1",
+    "unzipper": "^0.10.11"
+  },
+  "devDependencies": {
+    "pkg": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=6.4.0"
+  },
+  "pkg": {
+    "assets": [
+      "assets/*"
+    ]
+  },
+  "bin": "index.js",
+  "main": "index.js",
+  "scripts": {
+    "build-mac": "rm -rf build && pkg . --out-path build",
+    "postbuild-mac": "cp -R ./node_modules/puppeteer/.local-chromium build/chromium && cp credentials.json build && cp -R assets build",
+    "start": "node ."
+  },
+  "license": "Apache-2.0"
 }

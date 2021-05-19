@@ -1,4 +1,3 @@
-const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { google } = require('googleapis');
@@ -7,6 +6,7 @@ const twitter = require('./twitter');
 const express = require('express');
 const axios = require('axios');
 const { dialog } = require('electron');
+const puppeteer = require('puppeteer');
 const cors = require('cors');
 
 function parseRecipient(id, url) {
@@ -20,11 +20,11 @@ function parseRecipient(id, url) {
 }
 
 // Check twitter auth
-async function twitterAuth(main, win) {
+async function twitterAuth(main) {
     const authenticated = await twitter.verify_credentials();
     if (authenticated) {
         // Run google auth routine
-        googleAuth.auth(main, win);
+        googleAuth.auth(main);
     }
     else {
         // else delete api keys and tokens and prompt to regenerate
@@ -51,10 +51,31 @@ async function twitterAuth(main, win) {
             // Write new env file
             fs.writeFileSync('.env', output, 'utf8');
             // Start normal process
-            googleAuth.auth(main, win);
+            googleAuth.auth(main);
+            await browser.close();
         });
 
-        win.loadURL('http://localhost:4000/');
+        const isPkg = typeof process.pkg !== 'undefined';
+		const chromiumExecutablePath = (isPkg ?
+			puppeteer.executablePath().replace(
+                /^.*?\/node_modules\/puppeteer\/\.local-chromium/,
+				path.join(path.dirname(process.execPath), 'chromium')
+                )
+                : puppeteer.executablePath()
+                );
+                
+        // Start puppeteer
+		const browser = await puppeteer.launch({ 
+			executablePath: chromiumExecutablePath,
+			headless: false
+		});
+		const [page] = await browser.pages();
+        page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
+        browser.on('disconnected', () => {
+            process.kill(process.pid, 'SIGTERM');
+        });
+
+        await page.goto('http://localhost:4000/');
     }
 }
 
@@ -85,96 +106,50 @@ function handleUses() {
 }
 
 
-function createWindow () {
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
-        }
-    });
-    
-	const app = express();
-	app.use(express.urlencoded({ extended: true }));
-	app.use(express.json());
-    app.use(cors());
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors());
 
-    // Check remaining uses
-    handleUses();
-	
-	function main(auth) {
-        // Check total uses and create timestamp
-        let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
-        if (data.remaining < 1) {
-            // If cooldown has expired
-            if (data.time_stamp - Date.now() < 0) {
-                data.remaining = data.max_uses;
-                let day = 24 * 60 * 60 * 1000;
-                data.time_stamp = Date.now() + day;
-            }
-            else {
-                // Exit program
-                process.exit(1);
-            }
-        }
-        fs.writeFileSync('.data', JSON.stringify(data), 'utf8');
+// Check remaining uses
+handleUses();
 
-		const sheets = google.sheets({version: 'v4', auth});
-		sheets.spreadsheets.values.get({
-			spreadsheetId: '1_WGso2jn7LRHoqj80DvQk3i-SEQnQuv3aV5ii--zew4',
-			range: 'Blad1!A2:B',
-		}, (err, res) => {
-			if (err) {
-				// If error occurred, most likely invalid_grant or invalid_credentials, reauth
-				fs.unlink('./token.json', (err) => {
-					if (err) throw err;
-					console.log('token.json has been deleted');
-					console.log('Starting the authorization process...');
-					googleAuth.auth(main);
-					return null;
-				});		
-				return console.error('The API returned an error: ' + err);
-			} 
-	
-			// Parse names and links from sheet
-			let users = res.data.values.map(
-				(row) => [row[0], row[1]], 
-				res.data.values
-			);
+function main(auth) {
+    const sheets = google.sheets({version: 'v4', auth});
+    sheets.spreadsheets.values.get({
+        spreadsheetId: '1_WGso2jn7LRHoqj80DvQk3i-SEQnQuv3aV5ii--zew4',
+        range: 'Blad1!A2:B',
+    }, (err, res) => {
+        if (err) {
+            // If error occurred, most likely invalid_grant or invalid_credentials, reauth
+            fs.unlink('./token.json', (err) => {
+                if (err) throw err;
+                console.log('token.json has been deleted');
+                console.log('Starting the authorization process...');
+                googleAuth.auth(main);
+                return null;
+            });		
+            return console.error('The API returned an error: ' + err);
+        } 
 
-            // Load error messages, if any
-            (async () => {
-                if (fs.existsSync('.twitterlog')) {
-                    const errors = fs.readFileSync('.twitterlog', 'utf-8').split('\n');
-                    let errorMsg = 'These users have either blocked you, or are suspended:\n';
-                    for (var i = 0; i < errors.length; i++) {
-                        if (errors[i] != '') {
-                            var id = errors[i].slice(errors[i].indexOf('-') + 2);
-                            console.log(id);
-                            var user = await twitter.get_user_by_id(id);
-                            errorMsg += user.name + '  @' + user.username + '\n';
-                        }
-                    }
-                    dialog.showMessageBoxSync(win, {
-                        message: errorMsg,
-                        type: 'warning',
-                        title: 'Messages not sent'
-                    });
-                    fs.unlinkSync('.twitterlog');
-                }
-            })();
+        // Parse names and links from sheet
+        let users = res.data.values.map(
+            (row) => [row[0], row[1]], 
+            res.data.values
+        );
 
-            users = [
-                [
-                    'walz',
-                    'https://twitter.com/messages/785961919-785961919'
-                ],
-                [
-                    'BrokenSynk',
-                    'https://twitter.com/messages/785961919-2873086977'
-                ]
+        users = [
+            [
+                'walz',
+                'https://twitter.com/messages/785961919-785961919'
+            ],
+            [
+                'BrokenSynk',
+                'https://twitter.com/messages/785961919-2873086977'
             ]
+        ];
 
+        (async () => {
             // Start backend
             const port = 3000;
             app.listen(port);
@@ -183,12 +158,12 @@ function createWindow () {
             app.get('/', (req, res) => {
                 res.sendFile(__dirname + "/assets/index.html");
             });
-
+    
             app.get('/uses', (req, res) => {
                 let uses = JSON.parse(fs.readFileSync('.data', 'utf8'))['remaining'];
                 res.send(uses.toString());
             })
-
+    
             app.get('/get_release', async (req, res) => {
                 let url;
                 // Get total number of commits on portfolio
@@ -206,9 +181,10 @@ function createWindow () {
             let message = '';
             // Process form submission and get message
             app.post('/submit', async (req, res) => {
-                const hasUses = (await axios.get('http://localhost:8000/data'))['remaining'] > 1;
+                let remaining = JSON.parse(fs.readFileSync('.data', 'utf8'))['remaining'];
+                const hasUses = remaining > 0;
                 if (hasUses) {
-
+    
                     if (req.body.message != '') {
                         // Keys
                         let keys = Object.keys(req.body);
@@ -245,12 +221,10 @@ function createWindow () {
                         users.forEach((user) => {
                             twitter.direct_message(message, user.id);
                         });
-                        win.loadURL('http://localhost:8000');
+                        await page.goto('http://localhost:8000');
                     }
                     else {
-                        dialog.showMessageBox(win, {
-                            message: 'Please enter a message'
-                        })
+                        await page.evaluate(() => alert('Please enter a message'));
                     }
                 }
             });
@@ -260,28 +234,47 @@ function createWindow () {
                 res.send(users);
             })
     
+            const isPkg = typeof process.pkg !== 'undefined';
+            const chromiumExecutablePath = (isPkg ?
+                puppeteer.executablePath().replace(
+                    /^.*?\/node_modules\/puppeteer\/\.local-chromium/,
+                    path.join(path.dirname(process.execPath), 'chromium')
+                    )
+                    : puppeteer.executablePath()
+                    );
+
+            // Start puppeteer
+            const browser = await puppeteer.launch({ 
+                executablePath: chromiumExecutablePath,
+                headless: false
+            });
+            const [page] = await browser.pages();
+            page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
+    
             // Launch setup page to get message input
-            win.loadURL(`http://localhost:${port}/`);
-		});
+            await page.goto(`http://localhost:${port}/`);
 
-	}
+            // Load error messages
+            // let errorMsg = 'These users have either blocked you, or are suspended:\n';
+            // if (fs.existsSync('.twitterlog')) {
+            //     const errors = fs.readFileSync('.twitterlog', 'utf-8').split('\n');
+            //     for (var i = 0; i < errors.length; i++) {
+            //         if (errors[i] != '') {
+            //             var id = errors[i].slice(errors[i].indexOf('-') + 2);
+            //             console.log(id);
+            //             var user = await twitter.get_user_by_id(id);
+            //             errorMsg += user.name + '  @' + user.username + '\n';
+            //         }
+            //     }
+            //     fs.unlinkSync('.twitterlog');
+            // }
 
-    // Check twitter authorization
-    twitterAuth(main, win);
+            // If browser closes prematurely, end node process
+            browser.on('disconnected', () => {
+                process.kill(process.pid, 'SIGTERM');
+            });
+        })();
+    });
 }
-
-app.whenReady().then(() => {
-  createWindow()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
-    }
-  })
-})
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+// Check twitter authorization
+twitterAuth(main);

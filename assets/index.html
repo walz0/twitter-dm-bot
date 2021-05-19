@@ -34,11 +34,20 @@
 <script>
     function getData () {
         let data = JSON.parse(this.responseText);
+
         let remaining = document.getElementById('remaining');
         remaining.innerText = data['remaining'] + " uses remaining today";
         let time = document.getElementById('time');
         let dtString = (new Date(data['time_stamp'])).toLocaleString();
         time.innerText = "Current 24 hr period expires " + dtString;
+
+        if (data['remaining'] < 1) {
+            let header = document.createElement('h1');
+                header.className = 'uses-warning';
+                header.innerText = 'NO USES REMAINING';
+            let time = document.getElementById('time');
+            time.appendChild(header);
+        }
     }
 
     function toggleAll (e) {
@@ -87,6 +96,11 @@
 </script>
 
 <style>
+    .uses-warning {
+        color: #ff0000;
+        font-size: 35px;
+    }
+
     body {
         background: #232629;
         display: flex;

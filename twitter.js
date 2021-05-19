@@ -203,9 +203,9 @@ const direct_message = async (message, recipient_id) => {
             console.log("Error: Message could not be sent", 
                         err.response.status, 
                         err.response.statusText);
-            fs.appendFile('.twitterlog',
-                `${(new Date()).toLocaleString()} - ${recipient_id}\n`,
-            () => {});
+            // fs.appendFile('.twitterlog',
+            //     `${(new Date()).toLocaleString()} - ${recipient_id}\n`,
+            // () => {});
        });
 }
 
