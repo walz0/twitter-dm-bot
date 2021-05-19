@@ -6,12 +6,12 @@
   "private": true,
   "dependencies": {
     "axios-oauth-client": "^1.4.1",
+    "cors": "^2.8.5",
     "dotenv": "^9.0.2",
     "env": "0.0.2",
     "express": "^4.17.1",
     "get-port": "^5.1.1",
     "googleapis": "^39.0.0",
-    "cors": "^2.8.5",
     "mv": "^2.1.1",
     "oauth": "^0.9.15",
     "open": "^8.0.6",

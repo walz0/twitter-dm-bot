@@ -54,6 +54,7 @@ let oauth = new OAuth.OAuth(
 );
 
 const verify_credentials = async() => {
+    require('dotenv').config();
     oauth = new OAuth.OAuth(
         'https://api.twitter.com/oauth/request_token',
         'https://api.twitter.com/oauth/access_token',
@@ -165,6 +166,7 @@ const get_users = async (users) => {
 }
 
 const direct_message = async (message, recipient_id) => {
+    require('dotenv').config();
     const dm_url = 'https://api.twitter.com/1.1/direct_messages/events/new.json';
     const header = oauth.authHeader(
         dm_url,

@@ -50,7 +50,8 @@ async function twitterAuth(main) {
             // Write new env file
             fs.writeFileSync('.env', output, 'utf8');
             // Start normal process
-            googleAuth.auth(main);
+            // googleAuth.auth(main);
+            twitterAuth(main);
             await browser.close();
         });
 
@@ -270,7 +271,7 @@ function main(auth) {
             // If browser closes prematurely, end node process
             browser.on('disconnected', () => {
                 server.close();
-                // process.kill(process.pid, 'SIGTERM');
+                process.kill(process.pid, 'SIGTERM');
             });
         })();
     });
