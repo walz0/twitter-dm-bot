@@ -16,6 +16,8 @@
         <div class="button">
             <input type="submit" value="Submit">
         </div>
+        <div class="data" id="remaining"></div>
+        <div class="data" id="time"></div>
         <div class="warning">
             WARNING: This is the message that will be sent, once the bot starts sending it is not possible to stop it
         </div>
@@ -30,6 +32,15 @@
 </body>
 
 <script>
+    function getData () {
+        let data = JSON.parse(this.responseText);
+        let remaining = document.getElementById('remaining');
+        remaining.innerText = data['remaining'] + " uses remaining today";
+        let time = document.getElementById('time');
+        let dtString = (new Date(data['time_stamp'])).toLocaleString();
+        time.innerText = "Current 24 hr period expires " + dtString;
+    }
+
     function toggleAll (e) {
         let root = document.getElementById('users_root');
         for (var i = 0; i < root.children.length; i++) {
@@ -68,6 +79,11 @@
     oReq.addEventListener("load", loadUsers);
     oReq.open("GET", "http://localhost:3000/users");
     oReq.send();
+
+    oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", getData);
+    oReq.open("GET", "http://localhost:8000/data");
+    oReq.send();
 </script>
 
 <style>
@@ -81,6 +97,14 @@
     a {
         text-decoration: none;
         color: #fff;
+    }
+
+    .data {
+        font-family: 'Poppins';
+        font-weight: bold;
+        color: #fff;
+        flex-basis: 100%;
+        text-align: center;
     }
 
     .select-all {

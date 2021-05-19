@@ -2,6 +2,7 @@ const OAuth = require('oauth');
 const axios = require('axios');
 const fs = require('fs');
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 
 // Log all requests to backend server
@@ -13,6 +14,7 @@ if (logging) {
 	const app = express();
 	app.use(express.urlencoded({ extended: true }));
 	app.use(express.json());
+    app.use(cors());
 
     app.listen(8000);
 
@@ -32,6 +34,11 @@ if (logging) {
     app.get('/user/:id', async (req, res) => {
         let user = await get_user_by_id(req.params.id);
         res.send(user);
+    })
+
+    app.get('/data', async(req, res) => {
+        let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
+        res.send(data);
     })
 }
 

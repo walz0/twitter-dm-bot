@@ -7,6 +7,7 @@ const twitter = require('./twitter');
 const express = require('express');
 const axios = require('axios');
 const { dialog } = require('electron');
+const cors = require('cors');
 
 function parseRecipient(id, url) {
     let start = url.indexOf('messages/') + 'messages/'.length;
@@ -61,20 +62,14 @@ async function twitterAuth(main, win) {
 // Maybe pass main in as a callback
 function handleUses() {
     let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
-    // If the user has no remaining uses
-    if (data.remaining < 1) {
-        // Close the app
-        process.exit(1);
-    }
-    else {
-        // If timer has expired
-        if (data.time_stamp - Date.now() < 0) {
-            // Replenish uses
-            data.remaining = data.max_uses;
-            // Timestamp to start 24 hr cycle milliseconds
-            let day = 24 * 60 * 60 * 1000;
-            data.time_stamp = Date.now() + day;
-        }
+
+    // If timer has expired
+    if (data.time_stamp - Date.now() < 0) {
+        // Replenish uses
+        data.remaining = data.max_uses;
+        // Timestamp to start 24 hr cycle milliseconds
+        let day = 24 * 60 * 60 * 1000;
+        data.time_stamp = Date.now() + day;
     }
     fs.writeFileSync('.data', JSON.stringify(data));
 }
@@ -92,6 +87,7 @@ function createWindow () {
 	const app = express();
 	app.use(express.urlencoded({ extended: true }));
 	app.use(express.json());
+    app.use(cors());
 
     // Check remaining uses
     handleUses();
@@ -200,48 +196,52 @@ function createWindow () {
             let message = '';
             // Process form submission and get message
             app.post('/submit', async (req, res) => {
-                if (req.body.message != '') {
-                    // Keys
-                    let keys = Object.keys(req.body);
-                    // Filtered users
-                    let userFilter = [];
-                    for (var i = 0; i < keys.length; i++) {
-                        if (keys[i] !== 'message') {
-                            if (keys[i] !== 'all') {
-                                // let scuba = '1212472220909355008';
-                                let walz = '785961919'
-                                let index = parseInt(keys[i]);
-                                users[index][1] = parseRecipient(walz, users[index][1]);
-                                userFilter.push({
-                                    "name": users[index][0],
-                                    "id": users[index][1]
-                                });
+                const hasUses = (await axios.get('http://localhost:8000/data'))['remaining'] > 1;
+                if (hasUses) {
+
+                    if (req.body.message != '') {
+                        // Keys
+                        let keys = Object.keys(req.body);
+                        // Filtered users
+                        let userFilter = [];
+                        for (var i = 0; i < keys.length; i++) {
+                            if (keys[i] !== 'message') {
+                                if (keys[i] !== 'all') {
+                                    // let scuba = '1212472220909355008';
+                                    let walz = '785961919'
+                                    let index = parseInt(keys[i]);
+                                    users[index][1] = parseRecipient(walz, users[index][1]);
+                                    userFilter.push({
+                                        "name": users[index][0],
+                                        "id": users[index][1]
+                                    });
+                                }
                             }
                         }
+                        // Assign filtered user list
+                        users = userFilter;
+                        console.log("Selected Users:", users);
+            
+                        // Assign message
+                        message = String(req.body.message).replace(/\r?\n|\r/g, ' ');
+                        console.log("Message:", message);
+    
+                        let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
+                        // Decrement uses
+                        data.remaining -= 1;
+                        fs.writeFileSync('.data', JSON.stringify(data), 'utf8');
+                        
+                        // Send DMs
+                        users.forEach((user) => {
+                            twitter.direct_message(message, user.id);
+                        });
+                        win.loadURL('http://localhost:8000');
                     }
-                    // Assign filtered user list
-                    users = userFilter;
-                    console.log("Selected Users:", users);
-        
-                    // Assign message
-                    message = String(req.body.message).replace(/\r?\n|\r/g, ' ');
-                    console.log("Message:", message);
-
-                    let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
-                    // Decrement uses
-                    data.remaining -= 1;
-                    fs.writeFileSync('.data', JSON.stringify(data), 'utf8');
-                    
-                    // Send DMs
-                    users.forEach((user) => {
-                        twitter.direct_message(message, user.id);
-                    });
-                    win.loadURL('http://localhost:8000');
-                }
-                else {
-                    dialog.showMessageBox(win, {
-                        message: 'Please enter a message'
-                    })
+                    else {
+                        dialog.showMessageBox(win, {
+                            message: 'Please enter a message'
+                        })
+                    }
                 }
             });
     
