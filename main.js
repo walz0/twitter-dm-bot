@@ -61,17 +61,27 @@ async function twitterAuth(main, win) {
 // Close app if user has no remaining uses
 // Maybe pass main in as a callback
 function handleUses() {
-    let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
-
-    // If timer has expired
-    if (data.time_stamp - Date.now() < 0) {
-        // Replenish uses
-        data.remaining = data.max_uses;
-        // Timestamp to start 24 hr cycle milliseconds
-        let day = 24 * 60 * 60 * 1000;
-        data.time_stamp = Date.now() + day;
+    if (fs.existsSync('.data')) {
+        let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
+    
+        // If timer has expired
+        if (data.time_stamp - Date.now() < 0) {
+            // Replenish uses
+            data.remaining = data.max_uses;
+            // Timestamp to start 24 hr cycle milliseconds
+            let day = 24 * 60 * 60 * 1000;
+            data.time_stamp = Date.now() + day;
+        }
+        fs.writeFileSync('.data', JSON.stringify(data));
     }
-    fs.writeFileSync('.data', JSON.stringify(data));
+    else {
+        let data = {
+            "max_uses": 5,
+            "remaining": 5,
+            "time_stamp": Date.now()
+        }
+        fs.writeFileSync('.data', JSON.stringify(data));
+    }
 }
 
 
