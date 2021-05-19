@@ -54,6 +54,17 @@ let oauth = new OAuth.OAuth(
 );
 
 const verify_credentials = async() => {
+    oauth = new OAuth.OAuth(
+        'https://api.twitter.com/oauth/request_token',
+        'https://api.twitter.com/oauth/access_token',
+        process.env.API_KEY,
+        process.env.API_SECRET,
+        '1.0',
+        null,
+        'HMAC-SHA1',
+        11
+    );
+
     const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
     const header = oauth.authHeader(
         url,
@@ -73,16 +84,6 @@ const verify_credentials = async() => {
     }).catch((err) => { 
         output = false;
     });
-    oauth = new OAuth.OAuth(
-        'https://api.twitter.com/oauth/request_token',
-        'https://api.twitter.com/oauth/access_token',
-        process.env.API_KEY,
-        process.env.API_SECRET,
-        '1.0',
-        null,
-        'HMAC-SHA1',
-        11
-    );
     return output;
 }
 
