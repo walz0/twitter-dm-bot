@@ -34,7 +34,7 @@ async function twitterAuth(main, win) {
         app.use(express.json());
 
         // Start backend
-        const port = 3000;
+        const port = 4000;
         app.listen(port);
 
         // Return page with form
@@ -54,7 +54,7 @@ async function twitterAuth(main, win) {
             googleAuth.auth(main, win);
         });
 
-        win.loadURL('http://localhost:3000/');
+        win.loadURL('http://localhost:4000/');
     }
 }
 
