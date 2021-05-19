@@ -2,6 +2,7 @@ const fs = require('fs');
 const {google} = require('googleapis');
 const puppeteer = require('puppeteer');
 const open = require('open');
+const path = require('path');
 
 const express = require('express');
 const app = express();
@@ -34,7 +35,7 @@ async function getNewToken(oAuth2Client, callback) {
     const port = 5000;
 
     // Start server
-    app.listen(port);
+    let server = app.listen(port);
 
     // Return page with form
     app.get('/', (req, res) => {
@@ -78,7 +79,7 @@ async function getNewToken(oAuth2Client, callback) {
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
 
     browser.on('disconnected', () => {
-        process.kill(process.pid, 'SIGTERM');
+        server.close();
     });
 
     // Go to auth setup

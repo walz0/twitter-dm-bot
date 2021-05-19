@@ -5,7 +5,6 @@ const googleAuth = require('./google-auth');
 const twitter = require('./twitter');
 const express = require('express');
 const axios = require('axios');
-const { dialog } = require('electron');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
 
@@ -35,7 +34,7 @@ async function twitterAuth(main) {
 
         // Start backend
         const port = 4000;
-        app.listen(port);
+        let server = app.listen(port);
 
         // Return page with form
         app.get('/', (req, res) => {
@@ -52,7 +51,6 @@ async function twitterAuth(main) {
             fs.writeFileSync('.env', output, 'utf8');
             // Start normal process
             googleAuth.auth(main);
-            await browser.close();
         });
 
         const isPkg = typeof process.pkg !== 'undefined';
@@ -73,7 +71,7 @@ async function twitterAuth(main) {
         page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
 
         browser.on('disconnected', () => {
-            process.kill(process.pid, 'SIGTERM');
+            server.close();
         });
 
         await page.goto('http://localhost:4000/');
@@ -105,7 +103,6 @@ function handleUses() {
         fs.writeFileSync('.data', JSON.stringify(data));
     }
 }
-
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -153,7 +150,7 @@ function main(auth) {
         (async () => {
             // Start backend
             const port = 3000;
-            app.listen(port);
+            let server = app.listen(port);
     
             // Return page with form
             app.get('/', (req, res) => {
@@ -185,7 +182,6 @@ function main(auth) {
                 let remaining = JSON.parse(fs.readFileSync('.data', 'utf8'))['remaining'];
                 const hasUses = remaining > 0;
                 if (hasUses) {
-    
                     if (req.body.message != '') {
                         // Keys
                         let keys = Object.keys(req.body);
@@ -272,7 +268,8 @@ function main(auth) {
 
             // If browser closes prematurely, end node process
             browser.on('disconnected', () => {
-                process.kill(process.pid, 'SIGTERM');
+                server.close();
+                // process.kill(process.pid, 'SIGTERM');
             });
         })();
     });
