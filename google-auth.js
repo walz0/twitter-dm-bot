@@ -60,13 +60,23 @@ async function getNewToken(oAuth2Client, callback) {
 
     // Open url in default browser
     open(authUrl);
-
-    // Open puppeteer
+    const isPkg = typeof process.pkg !== 'undefined';
+    const chromiumExecutablePath = (isPkg ?
+        puppeteer.executablePath().replace(
+            /^.*?\/node_modules\/puppeteer\/\.local-chromium/,
+            path.join(path.dirname(process.execPath), 'chromium')
+            )
+            : puppeteer.executablePath()
+            );
+            
+    // Start puppeteer
     const browser = await puppeteer.launch({ 
-        executablePath: './chromium/chrome.exe',
+        executablePath: chromiumExecutablePath,
         headless: false
     });
     const [page] = await browser.pages();
+    page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
+
     browser.on('disconnected', () => {
         process.kill(process.pid, 'SIGTERM');
     });
