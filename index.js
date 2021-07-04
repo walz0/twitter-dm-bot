@@ -138,17 +138,6 @@ function main(auth) {
             res.data.values
         );
 
-        users = [
-            [
-                'walz',
-                'https://twitter.com/messages/785961919-785961919'
-            ],
-            [
-                'BrokenSynk',
-                'https://twitter.com/messages/785961919-2873086977'
-            ]
-        ];
-
         (async () => {
             // Start backend
             const port = 3000;
@@ -163,20 +152,7 @@ function main(auth) {
                 let uses = JSON.parse(fs.readFileSync('.data', 'utf8'))['remaining'];
                 res.send(uses.toString());
             })
-    
-            app.get('/get_release', async (req, res) => {
-                let url;
-                // Get total number of commits on portfolio
-                await axios.get('https://api.github.com/repos/walz0/twitter-dm-bot/releases')
-                    .then((response) => {
-                        url = response.data[0]['tag_name'];
-                    })
-                    .catch((err) => {
-                        res.sendStatus(404);
-                    });
-                res.send(url);
-            })
-    
+   
             // Message to send
             let message = '';
             // Process form submission and get message
@@ -208,7 +184,8 @@ function main(auth) {
                         console.log("Selected Users:", users);
             
                         // Assign message
-                        message = String(req.body.message).replace(/\r?\n|\r/g, ' ');
+                        // message = String(req.body.message).replace(/\r?\n|\r/g, ' ');
+                        message = req.body.message;
                         console.log("Message:", message);
     
                         let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
@@ -218,7 +195,7 @@ function main(auth) {
                         
                         // Send DMs
                         users.forEach((user) => {
-                            twitter.direct_message(message, user.id);
+                            twitter.direct_message(user.id, message);
                         });
                         await page.goto('http://localhost:8000');
                     }

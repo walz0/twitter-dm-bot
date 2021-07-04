@@ -6,7 +6,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 // Log all requests to backend server
-let logging = true;
+let logging = false;
 // Request results
 let log = [];
 
@@ -165,7 +165,18 @@ const get_users = async (users) => {
     return output;
 }
 
-const direct_message = async (message, recipient_id) => {
+const direct_message = async (recipient_id, message) => {
+    let oauth = new OAuth.OAuth(
+        'https://api.twitter.com/oauth/request_token',
+        'https://api.twitter.com/oauth/access_token',
+        process.env.API_KEY,
+        process.env.API_SECRET,
+        '1.0',
+        null,
+        'HMAC-SHA1',
+        11
+    );
+
     require('dotenv').config();
     const dm_url = 'https://api.twitter.com/1.1/direct_messages/events/new.json';
     const header = oauth.authHeader(
