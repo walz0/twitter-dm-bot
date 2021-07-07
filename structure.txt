@@ -1,0 +1,8 @@
+this should have a react frontend to make the config panels more functional
+
+/ :: Home
+/setup :: Setup
+    - google auth opens in new tab
+        - pass server handle into google auth function, call submit endpoint from there
+    - input boxes for both google and twitter keys
+        - link to twitter dashboard

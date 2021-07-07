@@ -1,42 +1,38 @@
 {
-  "name": "twitter-bot",
-  "version": "1.0.0",
-  "description": "A simple bot that sends twitter DMs",
-  "author": "Aidan Walz",
+  "name": "twitter-dm-bot",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios-oauth-client": "^1.4.1",
-    "cors": "^2.8.5",
-    "dotenv": "^9.0.2",
-    "env": "0.0.2",
-    "express": "^4.17.1",
-    "get-port": "^5.1.1",
-    "googleapis": "^39.0.0",
-    "mv": "^2.1.1",
-    "oauth": "^0.9.15",
-    "open": "^8.0.6",
-    "puppeteer": "^9.0.0",
-    "twit": "^2.2.11",
-    "twitter": "^1.7.1",
-    "unzipper": "^0.10.11"
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "web-vitals": "^1.0.1"
   },
-  "devDependencies": {
-    "pkg": "^5.0.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "engines": {
-    "node": ">=6.4.0"
-  },
-  "pkg": {
-    "assets": [
-      "assets/*"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
     ]
   },
-  "bin": "index.js",
-  "main": "index.js",
-  "scripts": {
-    "build-mac": "rm -rf build && pkg . --out-path build",
-    "postbuild-mac": "cp -R ./node_modules/puppeteer/.local-chromium build/chromium && cp credentials.json build && cp -R assets build",
-    "start": "node ."
-  },
-  "license": "Apache-2.0"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

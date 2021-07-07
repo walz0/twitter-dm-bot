@@ -4,7 +4,6 @@ const { google } = require('googleapis');
 const googleAuth = require('./google-auth');
 const twitter = require('./twitter');
 const express = require('express');
-const axios = require('axios');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
 
@@ -41,7 +40,8 @@ async function twitterAuth(main) {
             res.sendFile(__dirname + "/assets/twitter_api.html");
         });
 
-        app.post('/submit', async (req, res) => {
+        // Save keys to .env file
+        app.post('/submit_twitter', async (req, res) => {
             let keys = Object.keys(req.body);
             let output = '';
             keys.forEach((key) => {
@@ -50,30 +50,8 @@ async function twitterAuth(main) {
             // Write new env file
             fs.writeFileSync('.env', output, 'utf8');
             // Start normal process
-            // googleAuth.auth(main);
             twitterAuth(main);
             await browser.close();
-        });
-
-        const isPkg = typeof process.pkg !== 'undefined';
-		const chromiumExecutablePath = (isPkg ?
-			puppeteer.executablePath().replace(
-                /^.*?\/node_modules\/puppeteer\/\.local-chromium/,
-				path.join(path.dirname(process.execPath), 'chromium')
-                )
-                : puppeteer.executablePath()
-                );
-                
-        // Start puppeteer
-		const browser = await puppeteer.launch({ 
-			executablePath: chromiumExecutablePath,
-			headless: false
-		});
-		const [page] = await browser.pages();
-        page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
-
-        browser.on('disconnected', () => {
-            server.close();
         });
 
         await page.goto('http://localhost:4000/');
@@ -85,7 +63,6 @@ async function twitterAuth(main) {
 function handleUses() {
     if (fs.existsSync('.data')) {
         let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
-    
         // If timer has expired
         if (data.time_stamp - Date.now() < 0) {
             // Replenish uses
@@ -158,6 +135,10 @@ function main(auth) {
             // Process form submission and get message
             app.post('/submit', async (req, res) => {
                 let remaining = JSON.parse(fs.readFileSync('.data', 'utf8'))['remaining'];
+                let sender = {
+                    'scuba': '1212472220909355008',
+                    'walz_dev': '785961919'
+                }
                 const hasUses = remaining > 0;
                 if (hasUses) {
                     if (req.body.message != '') {
@@ -168,10 +149,8 @@ function main(auth) {
                         for (var i = 0; i < keys.length; i++) {
                             if (keys[i] !== 'message') {
                                 if (keys[i] !== 'all') {
-                                    // let scuba = '1212472220909355008';
-                                    let walz = '785961919'
                                     let index = parseInt(keys[i]);
-                                    users[index][1] = parseRecipient(walz, users[index][1]);
+                                    users[index][1] = parseRecipient(sender['scuba'], users[index][1]);
                                     userFilter.push({
                                         "name": users[index][0],
                                         "id": users[index][1]
@@ -209,24 +188,7 @@ function main(auth) {
             app.get('/users', (req, res) => {
                 res.send(users);
             })
-    
-            const isPkg = typeof process.pkg !== 'undefined';
-            const chromiumExecutablePath = (isPkg ?
-                puppeteer.executablePath().replace(
-                    /^.*?\/node_modules\/puppeteer\/\.local-chromium/,
-                    path.join(path.dirname(process.execPath), 'chromium')
-                    )
-                    : puppeteer.executablePath()
-                    );
 
-            // Start puppeteer
-            const browser = await puppeteer.launch({ 
-                executablePath: chromiumExecutablePath,
-                headless: false
-            });
-            const [page] = await browser.pages();
-            page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36');
-    
             // Launch setup page to get message input
             await page.goto(`http://localhost:${port}/`);
 
@@ -244,14 +206,21 @@ function main(auth) {
             //     }
             //     fs.unlinkSync('.twitterlog');
             // }
-
-            // If browser closes prematurely, end node process
-            browser.on('disconnected', () => {
-                server.close();
-                process.kill(process.pid, 'SIGTERM');
-            });
         })();
     });
 }
 // Check twitter authorization
 twitterAuth(main);
+
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+let server = app.listen(3000, () => {
+    console.log('App is now listening on port 3000')
+});
+
+// Return page with setup forms
+app.get('/setup', (req, res) => {
+    res.sendFile(__dirname + "/assets/auth.html");
+});
