@@ -1,0 +1,22 @@
+.Checkbox {
+    display: flex;
+    justify-content: left;
+    margin: 2px;
+    flex-basis: 100%;
+}
+
+.Checkbox a {
+    margin-top: -5px;
+}
+
+.Checkbox input[type=checkbox]
+{
+    /* Double-sized Checkboxes */
+    -ms-transform: scale(1.75); /* IE */
+    -moz-transform: scale(1.75); /* FF */
+    -webkit-transform: scale(1.75); /* Safari and Chrome */
+    -o-transform: scale(1.75); /* Opera */
+    transform: scale(1.75);
+    padding: 10px;
+}
+

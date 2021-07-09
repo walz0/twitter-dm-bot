@@ -3,6 +3,28 @@ this should have a react frontend to make the config panels more functional
 / :: Home
 /setup :: Setup
     - google auth opens in new tab
+        - press the get auth token button
+            - button calls api endpoint to start auth process
+            - call token endpoint on frontend until link appears
+                (link will appear shortly...)
+            - paste link in box, send token endpoint
         - pass server handle into google auth function, call submit endpoint from there
     - input boxes for both google and twitter keys
         - link to twitter dashboard
+
+
+endpoints ::
+    google
+        // writeToken - (google auth code)
+        // checkTimer
+        // checkToken 
+        // sheetSetup
+        // clients
+
+    twitter
+        // getKeys - (env file)
+        // setKeys
+        // getUser
+        // directMessage
+
+    handleUses
