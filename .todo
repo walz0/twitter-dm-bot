@@ -1,6 +1,0 @@
-UPDATER ::
-    - call github api to check for new releases, cache current release
-      in a dotfile
-
-BOT ::
-    - a clock to show how long is left on the remaining time

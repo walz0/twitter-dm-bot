@@ -1,0 +1,30 @@
+.result-list .name:hover {
+    color: #0087e0;
+}
+
+.result-list .status {
+    margin-left: 15px;
+}
+
+.result-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.result {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.result {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-left: 15px;
+    padding-bottom: 50px;
+}

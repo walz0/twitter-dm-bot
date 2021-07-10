@@ -12,8 +12,8 @@ export default class Checkbox extends Component {
                 <input 
                     type="checkbox" 
                     checked={this.props.checked}
-                    defaultChecked={true}
-                    onChange={this.props.onCheck.bind(this)}
+                    // defaultChecked={true}
+                    onChange={this.props.onCheck}
                     >
                 </input>
                 <a  href={this.props.client.dm_url}

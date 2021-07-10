@@ -1,0 +1,24 @@
+.Navbar {
+    width: 100vw;
+    margin-top: -17px;
+    padding-top: 15px;
+    height: 60px;
+    background: #222222;
+    border: solid;
+    border-width: 1px;
+    border-color: #fff;
+}
+
+.Navbar ul {
+    display: flex;    
+    flex-wrap: nowrap;
+    list-style-type: none;
+}
+
+.Navbar li {
+    margin-right: 25px;
+}
+
+.Navbar li:hover {
+    text-decoration: underline;
+}

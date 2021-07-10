@@ -6,20 +6,19 @@ import {
 } from 'react-router-dom';
 import Home from './components/Home';
 import Config from './components/Config';
+import Navbar from './components/Navbar';
 
 function App() {
     return (
         <div className="App">
             <Router>
+                <Navbar />
                 <Switch>
+                    <Route path="/settings">
+                        <Config />
+                    </Route>
                     <Route path="/">
                         <Home />            
-                    </Route>
-                    <Route path="/results">
-
-                    </Route>
-                    <Route path="/config">
-                        <Config />
                     </Route>
                 </Switch>
             </Router>
