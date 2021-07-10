@@ -6,32 +6,32 @@ export default class Notice extends Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            remaining: null,
-            max_uses: null,
-            timestamp: null
-        };
-    }
-
-    componentDidMount(props) {
-        axios.get("http://localhost:5000/data")
-            .then((res) => {
-                this.setState(res.data);
-                console.log(this.state);
-            })
     }
 
     render() {
-        return (
-            <div className="Notice">
-                <div className="uses">
-                    Uses remaining: { this.state.remaining }
+        if (this.props.data.remaining > 0) {
+            return (
+                <div className="Notice">
+                    <div className="uses">
+                        Uses remaining: { this.props.data.remaining }
+                    </div>
+                    <div className="time-left">
+                        Renews on: { new Date(this.props.data.time_stamp).toLocaleString() }
+                    </div>
                 </div>
-                <div className="time-left">
-                    Renews on: { new Date(this.state.time_stamp).toLocaleString() }
+            )
+        }
+        else {
+            return (
+                <div className="Notice">
+                    <div className="uses" style={{color: "#ff0000"}}>
+                        Uses remaining: { this.props.data.remaining }
+                    </div>
+                    <div className="time-left">
+                        Renews on: { new Date(this.props.data.time_stamp).toLocaleString() }
+                    </div>
                 </div>
-            </div>
-        )
+            )           
+        }
     }
 }

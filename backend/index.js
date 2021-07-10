@@ -217,7 +217,7 @@ let server = app.listen(5000, () => {
 });
 
 // Writes the google auth token to token.json
-app.get('/submit_google', (req, res) => {
+app.post('/submit_google', (req, res) => {
     let code = req.body.code;
     console.log(code);
     if (code) {
@@ -256,6 +256,8 @@ app.get('/clients', (req, res) => {
         }, (err, response) => {
             if (err) {
                 // There is an expired token
+                // Delete token.json
+                fs.unlinkSync('./token.json');
                 res.send(500, {error: 'Google auth token is expired'});
             }
             else {
@@ -278,6 +280,42 @@ app.get('/data', (req, res) => {
     let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
     res.send(data);
 });
+
+app.get('/check_uses', (req, res) => {
+    if (fs.existsSync('.data')) {
+        let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
+        // If timer has expired
+        if (data.time_stamp - Date.now() < 0) {
+            // Replenish uses
+            data.remaining = data.max_uses;
+            // Timestamp to start 24 hr cycle milliseconds
+            let day = 24 * 60 * 60 * 1000;
+            data.time_stamp = Date.now() + day;
+        }
+        fs.writeFileSync('.data', JSON.stringify(data));
+    }
+    else {
+        let day = 24 * 60 * 60 * 1000;
+        let data = {
+            "max_uses": 5,
+            "remaining": 5,
+            "time_stamp": Date.now() + day
+        }
+        fs.writeFileSync('.data', JSON.stringify(data));
+    }
+    res.sendStatus(200);
+})
+
+app.get('/decrement_uses', (req, res) => {
+    if (fs.existsSync('.data')) {
+        let data = JSON.parse(fs.readFileSync('.data', 'utf8'));
+        if (data.remaining > 0) {
+            data.remaining -= 1;
+        }
+        fs.writeFileSync('.data', JSON.stringify(data));
+    }
+    res.sendStatus(200);
+})
 
 // Returns true if the user is authenticated
 app.get('/twitter_auth', async (req, res) => {

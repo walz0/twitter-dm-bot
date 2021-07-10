@@ -13,14 +13,23 @@ export default class Home extends Component {
             message: "", // Message to be sent
             clients: [], // Clients pulled from sheet
             results: [], // Message response codes
-            sender: "1412861778653028360" // Twitter ID of sender
+            sender: "1412861778653028360", // Twitter ID of sender
+            invalidToken: false, // If google token is valid
+            data: [] // User data
         };
     }
 
     componentDidMount() {
+        axios.get("http://localhost:5000/check_uses");
+        axios.get("http://localhost:5000/data")
+            .then((res) => {
+                this.setState({
+                    data: res.data
+                })
+            });
         axios.get("http://localhost:5000/clients")
-            .then((response) => {
-                let data = response.data;
+            .then((res) => {
+                let data = res.data;
                 data = data.map((client) => {
                     return {
                         "name": client[0],
@@ -29,12 +38,12 @@ export default class Home extends Component {
                     };
                 }, data);
                 this.setState({
-                    clients: data,
+                    clients: data
                 });
             })
             .catch((err) => {
-                console.log(err);
-            })
+                this.setState({invalidToken: true});
+            });
     }
 
     handleInput(event) {
@@ -94,11 +103,13 @@ export default class Home extends Component {
                     "dm_url": client.dm_url,
                     "status": res.status
                 });
-                this.setState({
-                    "results": results
-                })
+                this.setState({"results": results})
             });
         });
+        let data = this.state.data;
+        data.remaining -= 1;
+        this.setState({"data": data})
+        axios.get('http://localhost:5000/decrement_uses');
     }
 
     handleSelectAll(event) {
@@ -113,57 +124,71 @@ export default class Home extends Component {
     }
 
     clientList() {
-        if (this.state.clients !== undefined) {
-            let clients = this.state.clients;
+        if (!this.state.invalidToken) {
+            if (this.state.clients !== undefined) {
+                let clients = this.state.clients;
+                return (
+                <div className="clients">
+                    {clients.map(
+                        (client) => (
+                            <Checkbox
+                                client={client} 
+                                checked={client.selected} 
+                                onCheck={() => {
+                                    clients.map((_, index) => {
+                                        if (client.name == clients[index].name) {
+                                            clients[index].selected = !client.selected;
+                                            this.setState({"clients": clients});
+                                        }
+                                    }, clients);
+                                }}
+                            />
+                        ),
+                        clients)}
+                </div>);
+            }
+        }
+        else {
             return (
-            <div className="clients">
-                {clients.map(
-                    (client) => (
-                        <Checkbox
-                            client={client} 
-                            checked={client.selected} 
-                            onCheck={() => {
-                                clients.map((_, index) => {
-                                    if (client.name == clients[index].name) {
-                                        clients[index].selected = !client.selected;
-                                        this.setState({"clients": clients});
-                                    }
-                                }, clients);
-                            }}
-                        />
-                    ),
-                    clients)}
-            </div>);
+                <div>
+                    An error occurred, google auth token is missing or expired
+                </div>
+            );
         }
     }
 
     render() {
-        return (
-            <div className="Home">
-                <h1>Twitter DM Bot</h1>
-                <Notice />
-                {this.inputBox()}
-                <div className="button">
-                    <input type="submit" onClick={this.send.bind(this)}></input>
+        if (this.state.data.remaining > 0) {
+            return (
+                <div className="Home">
+                    <h1>Twitter DM Bot</h1>
+                    <Notice data={this.state.data}/>
+                    {this.inputBox()}
+                    <div className="button">
+                        <input type="submit" onClick={this.send.bind(this)}></input>
+                    </div>
+                    <Results results={this.state.results}/>
+                    <h3>
+                        Recipients: {
+                            this.state.clients.filter(
+                                (client) => client.selected, 
+                                this.state.clients).length
+                            }
+                    </h3>
+                    <div className="select-all">
+                        Select All
+                        <input 
+                            type="checkbox" 
+                            defaultChecked={true}
+                            onChange={this.handleSelectAll.bind(this)}
+                            ></input>
+                    </div>
+                    {this.clientList()}
                 </div>
-                <Results results={this.state.results}/>
-                <h3>
-                    Recipients: {
-                        this.state.clients.filter(
-                            (client) => client.selected, 
-                            this.state.clients).length
-                        }
-                </h3>
-                <div className="select-all">
-                    Select All
-                    <input 
-                        type="checkbox" 
-                        defaultChecked={true}
-                        onChange={this.handleSelectAll.bind(this)}
-                        ></input>
-                </div>
-                {this.clientList()}
-            </div>
-        )
+            )
+        }
+        else {
+            return(<Notice data={this.state.data}/>);
+        }
     }
 }

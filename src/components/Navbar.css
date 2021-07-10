@@ -1,15 +1,29 @@
 .Navbar {
     width: 100vw;
-    margin-top: -17px;
-    padding-top: 15px;
     height: 60px;
+
+    margin-top: -15px;
+    margin-left: -5px;
+    padding-top: 15px;
+    overflow-x: hidden;
+
+    position: fixed;
+    top:0;
+    left: 0;
+
     background: #222222;
+    display: flex;
+    justify-content: left;
+
     border: solid;
     border-width: 1px;
     border-color: #fff;
 }
 
 .Navbar ul {
+    position: absolute;
+    left: 0;
+
     display: flex;    
     flex-wrap: nowrap;
     list-style-type: none;

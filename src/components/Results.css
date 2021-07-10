@@ -9,12 +9,17 @@
 .result-list {
     display: flex;
     justify-content: center;
+    overflow-y: scroll;
     flex-wrap: wrap;
-    width: 100%;
+    width: fit-content;
+    padding: 10px 25px 10px 25px;
+    margin: auto;
+    max-height: 300px;
 }
 
 .result {
     width: 100%;
+    height: fit-content;
     display: flex;
     justify-content: center;
     flex-wrap: nowrap;

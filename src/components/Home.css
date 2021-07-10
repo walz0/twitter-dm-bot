@@ -6,6 +6,7 @@
 }
 
 body {
+    margin-top: 80px;
     background: #232629;
     display: flex;
     color: #fff;
@@ -37,8 +38,8 @@ a {
     overflow-y: scroll;
     display: flex;
 
-    margin: auto;
-    margin-top: 20px;
+    margin: 20px auto 30px auto;
+    padding: 10px;
 
     justify-content: center;
     flex-wrap: wrap;

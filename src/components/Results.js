@@ -9,10 +9,8 @@ export default class Results extends Component {
     resultList() {
         let results = this.props.results;
         if (results.length > 0) {
-
             return(
                 <div className="result-list">
-                    <h1>Results</h1>
                     {results.map(
                         (result) => {
                             if (result.status == 200) {
@@ -44,10 +42,16 @@ export default class Results extends Component {
     }
 
     render() {
-        return (
-            <div className="Results">
-                { this.resultList() }
-            </div>
-        )
+        if (this.props.results.length == 0) {
+            return (<div className="Results"></div>);
+        }
+        else {
+            return (
+                <div className="Results">
+                    <h1>Results</h1>
+                    { this.resultList() }
+                </div>
+            )
+        }
     }
 }
