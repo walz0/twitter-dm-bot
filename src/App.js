@@ -23,7 +23,7 @@ export default class App extends Component {
 
     componentDidMount(props) {
         let token = localStorage.getItem("token");
-        axios.post('http://localhost:5000/auth', 
+        axios.post(process.env.REACT_APP_API + '/auth', 
             {"token": token})
         .then((res) => {
             if (res.status == 200) {
@@ -37,7 +37,6 @@ export default class App extends Component {
 
     authUser() {
         this.setState({authenticated: true});
-        console.log('test');
         console.log(this.state);
     }
 

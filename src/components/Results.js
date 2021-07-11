@@ -8,6 +8,7 @@ export default class Results extends Component {
 
     resultList() {
         let results = this.props.results;
+        console.log(results);
         if (results.length > 0) {
             return(
                 <div className="result-list">

@@ -5,7 +5,7 @@ import md5 from 'md5';
 import './Login.css';
 
 export default class Login extends Component {
-
+    
     constructor(props) {
         super(props);
 
@@ -28,7 +28,8 @@ export default class Login extends Component {
     }
 
     submit() {
-        axios.post('http://localhost:5000/token',
+        console.log(process.env.REACT_APP_API);
+        axios.post(process.env.REACT_APP_API + '/token',
             {
                 "username": this.state.username,
                 "password": this.state.password

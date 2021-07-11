@@ -13,21 +13,22 @@ export default class Home extends Component {
             message: "", // Message to be sent
             clients: [], // Clients pulled from sheet
             results: [], // Message response codes
-            sender: "1212472220909355008", // Twitter ID of sender
+            // sender: "1212472220909355008", // Twitter ID of sender
+            sender: "141286177865302836",
             invalidToken: false, // If google token is valid
             data: [] // User data
         };
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/check_uses");
-        axios.get("http://localhost:5000/data")
+        axios.get(process.env.REACT_APP_API + "/check_uses");
+        axios.get(process.env.REACT_APP_API + "/data")
             .then((res) => {
                 this.setState({
                     data: res.data
                 })
             });
-        axios.get("http://localhost:5000/clients")
+        axios.get(process.env.REACT_APP_API + "/clients")
             .then((res) => {
                 let data = res.data;
                 data = data.map((client) => {
@@ -78,18 +79,17 @@ export default class Home extends Component {
                 sliced.slice(0, id_index).replace('-', '');
         }
 
-        let clients = this.state.clients;
-        let selected = clients.filter((client) => client.selected, clients);
-        // let selected = [{
-        //     "name": "Walz0D",
-        //     "dm_url": "https://twitter.com/messages/1412861778653028360-1412861778653028360"
-        // }];
-        // THIS IS WORKING
+        // let clients = this.state.clients;
+        // let selected = clients.filter((client) => client.selected, clients);
+        let selected = [{
+            "name": "Walz0D",
+            "dm_url": "https://twitter.com/messages/1412861778653028360-1412861778653028360"
+        }];
         selected.map((client) => {
             let id = parseURL(this.state.sender, client.dm_url);
             axios({
                 method: 'post',
-                url: 'http://localhost:5000/direct_message',
+                url: process.env.REACT_APP_API + '/direct_message',
                 data: {
                     "id": id,
                     "message": this.state.message
@@ -107,7 +107,7 @@ export default class Home extends Component {
         let data = this.state.data;
         data.remaining -= 1;
         this.setState({"data": data})
-        axios.get('http://localhost:5000/decrement_uses');
+        axios.get(process.env.REACT_APP_API + '/decrement_uses');
     }
 
     handleSelectAll(event) {

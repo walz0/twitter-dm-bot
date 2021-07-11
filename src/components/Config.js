@@ -21,7 +21,7 @@ export default class Config extends Component {
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/check_token")
+        axios.get(process.env.REACT_APP_API + "/check_token")
             .then((res) => {
                 if (res.data == "OK") {
                     this.setState({tokenStatus: res.data});
@@ -34,7 +34,7 @@ export default class Config extends Component {
             .catch((err) => {
                 console.log(err);
             });
-        axios.get("http://localhost:5000/twitter_auth")
+        axios.get(process.env.REACT_APP_API + "/twitter_auth")
             .then((res) => {
                 this.setState({
                     twitterAuth: res.data
@@ -45,7 +45,7 @@ export default class Config extends Component {
     submitGoogle() {
         axios({
             method: 'post',
-            url: 'http://localhost:5000/submit_google',
+            url: process.env.REACT_APP_API + '/submit_google',
             data: {
                 "code": this.state.googleInput
             }
@@ -102,7 +102,7 @@ export default class Config extends Component {
     submitTwitter() {
         axios({
             method: 'post',
-            url: 'http://localhost:5000/submit_twitter',
+            url: process.env.REACT_APP_API + '/submit_twitter',
             data: {
                 api_key: this.state.apiKey,
                 api_secret: this.state.apiSecret,
@@ -111,7 +111,7 @@ export default class Config extends Component {
             }
         })
         .then((res) => {
-            axios.get("http://localhost:5000/twitter_auth")
+            axios.get(process.env.REACT_APP_API + "/twitter_auth")
                 .then((response) => {
                     if (response.data == true) {
                         this.setState({twitterAuth: response.data})

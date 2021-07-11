@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "googleapis": "^80.2.0",
     "md5": "^2.3.0",
     "oauth": "^0.9.15",

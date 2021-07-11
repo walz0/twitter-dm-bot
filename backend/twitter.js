@@ -166,6 +166,7 @@ const get_users = async (users) => {
 }
 
 const direct_message = async (recipient_id, message) => {
+    require('dotenv').config();
     let oauth = new OAuth.OAuth(
         'https://api.twitter.com/oauth/request_token',
         'https://api.twitter.com/oauth/access_token',
@@ -177,7 +178,6 @@ const direct_message = async (recipient_id, message) => {
         11
     );
 
-    require('dotenv').config();
     const dm_url = 'https://api.twitter.com/1.1/direct_messages/events/new.json';
     const header = oauth.authHeader(
         dm_url,
@@ -185,7 +185,8 @@ const direct_message = async (recipient_id, message) => {
         process.env.TOKEN_SECRET,
         'post'
     );
-    axios({
+    let output;
+    await axios({
         method: 'post',
         url: dm_url,
         headers: {
@@ -206,31 +207,12 @@ const direct_message = async (recipient_id, message) => {
             }
         }
     }).then((res) => {
-        log.push({
-            'type': 'message_create', 
-            'id': recipient_id, 
-            'status': res.status, 
-            'statusText': res.statusText
-        });
-        console.log(
-            recipient_id, 
-            res.status, 
-            res.statusText
-        )})
-       .catch((err) => {
-            log.push({
-                'type': 'message_create', 
-                'id': recipient_id, 
-                'status': err.response.status, 
-                'statusText': err.response.statusText
-            });
-            console.log("Error: Message could not be sent", 
-                        err.response.status, 
-                        err.response.statusText);
-            // fs.appendFile('.twitterlog',
-            //     `${(new Date()).toLocaleString()} - ${recipient_id}\n`,
-            // () => {});
-       });
+        output = res.data;
+    })
+    .catch((err) => {
+        output = res.data;
+    });
+    return output;
 }
 
 exports.direct_message = direct_message;
