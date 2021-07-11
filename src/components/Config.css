@@ -2,6 +2,11 @@
     margin-top: 30px;
 }
 
+.Config .token-url {
+    font-size: 20px;
+    margin: 10px;
+}
+
 .Config .container {
     margin: 10px;
 }
