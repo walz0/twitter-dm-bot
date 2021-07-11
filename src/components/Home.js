@@ -13,8 +13,7 @@ export default class Home extends Component {
             message: "", // Message to be sent
             clients: [], // Clients pulled from sheet
             results: [], // Message response codes
-            // sender: "1212472220909355008", // Twitter ID of sender
-            sender: "141286177865302836",
+            sender: process.env.REACT_APP_SENDER, // Twitter ID of sender
             invalidToken: false, // If google token is valid
             data: [] // User data
         };
