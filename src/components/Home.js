@@ -13,7 +13,7 @@ export default class Home extends Component {
             message: "", // Message to be sent
             clients: [], // Clients pulled from sheet
             results: [], // Message response codes
-            sender: "1412861778653028360", // Twitter ID of sender
+            sender: "1212472220909355008", // Twitter ID of sender
             invalidToken: false, // If google token is valid
             data: [] // User data
         };
@@ -66,9 +66,7 @@ export default class Home extends Component {
     // Send DM to selected clients
     send() {
         // Clear results before sending again
-        this.setState({
-            results: []
-        })
+        this.setState({results: []})
 
         function parseURL(sender_id, url) {
             let start = url.indexOf('messages/') + 'messages/'.length;
@@ -80,12 +78,12 @@ export default class Home extends Component {
                 sliced.slice(0, id_index).replace('-', '');
         }
 
-        // let clients = this.state.clients;
-        // let selected = clients.filter((client) => client.selected, clients);
-        let selected = [{
-            "name": "Walz0D",
-            "dm_url": "https://twitter.com/messages/1412861778653028360-1412861778653028360"
-        }];
+        let clients = this.state.clients;
+        let selected = clients.filter((client) => client.selected, clients);
+        // let selected = [{
+        //     "name": "Walz0D",
+        //     "dm_url": "https://twitter.com/messages/1412861778653028360-1412861778653028360"
+        // }];
         // THIS IS WORKING
         selected.map((client) => {
             let id = parseURL(this.state.sender, client.dm_url);
