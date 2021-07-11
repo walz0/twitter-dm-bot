@@ -1,0 +1,18 @@
+.Login {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.Login .container {
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    margin: 15px;
+}
+
+.Login .container input {
+    margin-left: 10px;
+}

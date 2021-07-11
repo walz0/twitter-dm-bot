@@ -1,10 +1,9 @@
-const path = require('path');
 const fs = require('fs');
 const { google } = require('googleapis');
 const googleAuth = require('./google-auth');
 const twitter = require('./twitter');
+const md5 = require('md5');
 const express = require('express');
-const puppeteer = require('puppeteer');
 const cors = require('cors');
 
 function parseRecipient(id, url) {
@@ -355,7 +354,7 @@ app.get('/get_user', async (req, res) => {
         let response = await twitter.get_user(user);
         res.send(response);
     }
-})
+});
 
 app.post('/direct_message', async (req, res) => {
     let id = req.body.id;
@@ -367,4 +366,44 @@ app.post('/direct_message', async (req, res) => {
         response = await twitter.direct_message(id, message);
         res.send(response);
     }
-})
+});
+
+app.post('/token', (req, res) => {
+    console.log(req.body);
+    let username = req.body.username;
+    let hash = req.body.password;
+    let userData = JSON.parse(fs.readFileSync("users.json", {encoding: 'utf-8'}));
+    let i;
+    let foundUser = userData.filter((user, index) => {
+        if (username == user.username) {
+            if (hash == user.hash) {
+                i = index;
+                return user;
+            }
+        }
+    }, userData);
+    if (i !== undefined) {
+        let token = md5(Date.now());
+        userData[i]['token'] = token;
+        fs.writeFileSync("users.json", JSON.stringify(userData));
+        res.send({
+            "access_token": token
+        });
+    }
+    else {
+        res.send(500, {error: "Incorrect username or password"})
+    }
+});
+
+app.post('/auth', (req, res) => {
+    let token = req.body.token;
+
+    let userData = JSON.parse(fs.readFileSync("users.json", {encoding: 'utf-8'}));
+    let foundUser = userData.filter((user) => {
+        if (token == user.token) {
+            res.sendStatus(200);
+        }
+    }, userData);
+    res.send(500, {error: "Invalid access token"});
+});
+
