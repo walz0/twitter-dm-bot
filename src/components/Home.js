@@ -27,6 +27,12 @@ export default class Home extends Component {
                     data: res.data
                 })
             });
+        axios.get(process.env.REACT_APP_API + "/twitter_auth")
+            .then((res) => {
+                if (res.data == false) {
+                    alert("Twitter API is not authenticated, please fix keys in settings");
+                }
+            })
         axios.get(process.env.REACT_APP_API + "/clients")
             .then((res) => {
                 let data = res.data;
@@ -65,6 +71,8 @@ export default class Home extends Component {
 
     // Send DM to selected clients
     send() {
+
+
         // Clear results before sending again
         this.setState({results: []})
 

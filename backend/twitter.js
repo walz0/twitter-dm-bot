@@ -210,7 +210,7 @@ const direct_message = async (recipient_id, message) => {
         output = res.data;
     })
     .catch((err) => {
-        output = res.data;
+        output = err;
     });
     return output;
 }
